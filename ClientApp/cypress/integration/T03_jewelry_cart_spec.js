@@ -1,0 +1,51 @@
+/* eslint-disable no-undef */
+describe('when jewelry has been added', function() {
+    beforeEach(function() {
+        cy.request('POST', 'http://localhost:3001/testing/reset')
+        cy.visit('http://localhost:3000/admin/login')
+        cy.get('#un').type('jewelryAdmin')
+        cy.get('#pw').type('secret')
+        cy.contains('Login').click()
+        cy.contains('Add Jewelry')
+        const fileName = 'ear1.jpg'
+        cy.get('#ear').click()
+        cy.fixture(fileName).then(fileContent => {
+            cy.get('[type="file"]').upload({ fileContent, fileName, mimeType: 'image/jpeg' })
+        })
+        cy.get('#price').type(0)
+        cy.get('#story').type('cypress-eiole')
+        cy.contains('Upload').click()
+        cy.wait(5000)
+    })
+
+    it('jewelry can be found and bought', function() {
+        cy.visit('http://localhost:3000')
+        cy.contains('add to cart').click()
+        cy.contains('in cart')
+        cy.contains(1).click()
+        cy.contains('Items in your cart')
+        cy.get('#firstName').type('Test')
+        cy.get('#lastName').type('Customer')
+        cy.get('#email').type('test@email.com')
+        cy.get('#street').type('Cypresstreet 1')
+        cy.get('#city').type('Helsinki')
+        cy.get('#country').select('Switzerland')
+        cy.get('#zip').type('12345')
+        cy.get('#checkoutBtn').click()
+        cy.wait(2000)
+        cy.contains('paypal')
+    })
+
+    it('jewelry can be removed from cart', function() {
+        cy.visit('http://localhost:3000')
+        cy.contains('add to cart').click()
+        cy.contains(1).click()
+        cy.contains('Remove').click()
+        cy.contains('cart is empty')
+        cy.contains('home').click()
+        cy.contains('add to cart').click()
+        cy.contains(1).click()
+        cy.contains('Empty Cart').click()
+        cy.contains('cart is empty')
+    })
+})
